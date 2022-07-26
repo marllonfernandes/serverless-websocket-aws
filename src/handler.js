@@ -113,7 +113,7 @@ module.exports.createToken = function (event, context, callback) {
       // Required for cookies, authorization headers with HTTPS
       "Access-Control-Allow-Credentials": true,
     },
-    body: JSON.stringify({ message: "Hello World API!" }),
+    body: JSON.stringify({ token: "123456" }),
   };
 
   callback(null, response);
