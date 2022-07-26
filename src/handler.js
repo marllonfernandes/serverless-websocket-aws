@@ -1,11 +1,9 @@
 'use strict';
 
 const AWS = require('aws-sdk');
-let dynamo = new AWS.DynamoDB.DocumentClient();
+let { getConnectionIds, addConnection, deleteConnection } = require("./dynamo");
 
 require('aws-sdk/clients/apigatewaymanagementapi'); 
-
-const CHATCONNECTION_TABLE = 'chatIdTable';
 
 const successfullResponse = {
   statusCode: 200,
@@ -13,7 +11,27 @@ const successfullResponse = {
 };
 
 module.exports.connectionHandler = (event, context, callback) => {
-  console.log(event);
+  
+  // pegar parametros queryString na url
+  // const token = event["queryStringParameters"]["token"];
+
+  // console.log("routeKey", event.requestContext.routeKey);
+  // console.log('eventType', event.requestContext.eventType);
+  // console.log('requestTime', event.requestContext.requestTime);
+  // console.log('stage', event.requestContext.stage);
+  // console.log('connectionId', event.requestContext.connectionId);
+
+
+  try {
+    const token = event["queryStringParameters"]["token"];
+    console.log("Token: ", token);
+  } catch (err) {
+    console.log("Requeried Token!");
+    return callback(null, {
+      statusCode: 400,
+      body: "Requeried Token!",
+    });
+  }
 
   if (event.requestContext.eventType === 'CONNECT') {
     // Handle connection
@@ -68,15 +86,6 @@ const sendMessageToAllConnected = (event) => {
   });
 }
 
-const getConnectionIds = () => {  
-  const params = {
-    TableName: CHATCONNECTION_TABLE,
-    ProjectionExpression: 'connectionId'
-  };
-
-  return dynamo.scan(params).promise();
-}
-
 const send = (event, connectionId) => {
   const body = JSON.parse(event.body);
   const postData = body.data;  
@@ -94,24 +103,18 @@ const send = (event, connectionId) => {
   return apigwManagementApi.postToConnection(params).promise();
 };
 
-const addConnection = connectionId => {
-  const params = {
-    TableName: CHATCONNECTION_TABLE,
-    Item: {
-      connectionId: connectionId 
-    }
+module.exports.createToken = function (event, context, callback) {
+  console.log("Hello World API!");
+  const response = {
+    statusCode: 200,
+    headers: {
+      // Required for CORS support to work
+      "Access-Control-Allow-Origin": "*",
+      // Required for cookies, authorization headers with HTTPS
+      "Access-Control-Allow-Credentials": true,
+    },
+    body: JSON.stringify({ message: "Hello World API!" }),
   };
 
-  return dynamo.put(params).promise();
-};
-
-const deleteConnection = connectionId => {
-  const params = {
-    TableName: CHATCONNECTION_TABLE,
-    Key: {
-      connectionId: connectionId 
-    }
-  };
-
-  return dynamo.delete(params).promise();
+  callback(null, response);
 };

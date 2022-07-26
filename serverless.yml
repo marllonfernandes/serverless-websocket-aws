@@ -1,8 +1,13 @@
-service: websockets-chat 
-
+service: websocket-service
+frameworkVersion: '2 || 3'
+  
 provider:
   name: aws
-  runtime: nodejs8.10
+  runtime: nodejs14.x
+  lambdaHashingVersion: 20201221
+  role: arn:aws:iam::088639415603:role/eng-roles/rm_sqs_role
+  region: ${opt:region, 'sa-east-1'}
+  stage: ${opt:stage, 'dev'}
 
   iamRoleStatements:
     - Effect: Allow
@@ -15,28 +20,44 @@ provider:
         - Fn::GetAtt: [ChatTable, Arn]
     - Effect: Allow
       Action:
-        - "execute-api:ManageConnections"
+        - "websocket-service:ManageConnections"
       Resource:
-        - "arn:aws:execute-api:*:*:**/@connections/*"
+        - "arn:aws:websocket-service:*:*:**/@connections/*"
+
+package:
+  exclude:
+    - .gitignore
+    - .git/**
+    - .vscode
+    - teste.json
 
 functions:
   connectionHandler:
-    handler: handler.connectionHandler
+    handler: src/handler.connectionHandler
     events:
       - websocket:
           route: $connect
       - websocket:
           route: $disconnect
   defaultHandler:
-    handler: handler.defaultHandler
+    handler: src/handler.defaultHandler
     events:
       - websocket:
           route: $default
   sendMessageHandler:
-    handler: handler.sendMessageHandler
+    handler: src/handler.sendMessageHandler
     events:
       - websocket:
           route: sendMessage
+  createToken:
+    handler: src/handler.createToken
+    events:
+      - http:
+          path: api/token
+          method: post
+          cors:
+            origin: '*'
+            headers: '*'
 
 resources:
   Resources:
