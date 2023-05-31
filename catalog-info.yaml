@@ -13,4 +13,4 @@ spec:
   lifecycle: production
   owner: ti-team-servicos
   definition:
-    $text: https://github.com/APIs-guru/openapi-directory/blob/dab6854d4d599aafb0eb36e6c7ae1fe0c37509b7/APIs/spotify.com/2021.4.2/openapi.yaml
+    $text: https://github.com/marllonfernandes/serverless-websocket-aws/blob/4998127cbb3bf53a308a3ef8ebe99c728935eb03/openapi.yaml
