@@ -1,0 +1,10 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: serverless-websocket-aws
+  annotations:
+    github.com/project-slug: marllonfernandes/serverless-websocket-aws
+spec:
+  type: other
+  lifecycle: unknown
+  owner: ti-team-servicos
